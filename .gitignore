@@ -1,5 +1,6 @@
 # ignore RAMS Output files
 *.h5
+*-head.txt
 
 # ignore compile files
 *.a
