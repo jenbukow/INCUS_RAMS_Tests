@@ -6,7 +6,7 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_20210806_dev
+RAMS_ROOT=/nobackupp19/swfreema/INCUS/rams_dev/RAMS
 RAMS_VERSION=6.3.02
 
 #############################################################################
@@ -15,13 +15,13 @@ RAMS_VERSION=6.3.02
 # Typically can use "parallel" for either, but some supercomputers require
 # use of the serial executable.
 #############################################################################
-HDF5_ROOT=/home/smsaleeb/software/hdf5-1.10.7
+HDF5_ROOT=/nobackupp19/swfreema/INCUS/rams_dev/hdf5-zfp-work/HDF5-1.12.2
 
 #############################################################################
 # Set root locations for parallel processing MPI software.
 # You can comment out MPI_ROOT for serial processing compile.
 #############################################################################
-MPI_ROOT=/home/smsaleeb/software/mpich-3.3.2
+MPI_ROOT=/nasa/hpe/mpt/2.25_rhel79/
 
 #############################################################################
 # Do not change these 2. They point from RAMS_ROOT to the source code.
@@ -41,7 +41,7 @@ UTILS_INCS=-I$(MODEL)/include
 #  -Wl,-rpath,/home/smsaleeb/software/szip-2.1/lib \
 #  -Wl,-rpath,/home/smsaleeb/software/zlib-1.2.5/lib
 HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
-HDF5_INCS=-I$(HDF5_ROOT)/include
+HDF5_INCS=-I$(HDF5_ROOT)/include -I/nobackupp19/swfreema/INCUS/rams_dev/hdf5-zfp-work/H5Z-ZFP-1.1.0/include
 HDF5_DEFS=
 
 #############################################################################
@@ -78,11 +78,11 @@ CMACH=PC_LINUX1  #Standard Linux (only option available now)
 # (-g) for debugging, (-traceback) for more compiler error info
 # (-check bounds) for array bounds checking, (-fp-model precise) for IEEE
 # (-check uninit) for finding uninitialized variables, (-free) for free format
-F_COMP=/home/smsaleeb/intel/composer_xe_2011_sp1.8.273/bin/intel64/ifort
+F_COMP=mpif90
 F_OPTS1=-free -O1 -fp-model precise
 F_OPTS2=-free -O2 -fp-model precise
 LOADER_OPTS= -free -O2 -fp-model precise
-LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
+LIBS=-L/usr/lib/x86_64-linux-gnu -L/nasa/szip/2.1.1/lib -lrt -lpthread -lsz -lz
 
 #*****************************
 # FORTRAN INTEL IFORT COMPILER Double Precision
@@ -142,7 +142,7 @@ LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 # removing the "-w" if you wish to alter code to eliminate warnings.
 #############################################################################
 C_COMP=gcc
-C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DENABLE_PARALLEL_COMPRESSION -w
+C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DENABLE_PARALLEL_COMPRESSION -w -DENABLE_ZFP_COMPRESSION
 #C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DRAMS_DOUBLE_PREC \
 #  -DENABLE_PARALLEL_COMPRESSION -w
 
@@ -165,5 +165,5 @@ ARCH=ar rsU
 # Comment out these "PAR_" lines for serial processing compile.
 #############################################################################
 PAR_INCS=-I$(MPI_ROOT)/include
-PAR_LIBS=-L$(MPI_ROOT)/lib -lmpich -lmpl
+PAR_LIBS=-L$(MPI_ROOT)/lib 
 PAR_DEFS=-DRAMS_MPI
