@@ -2,6 +2,9 @@
 *.h5
 *-head.txt
 
+# ignore Pleiades output files
+*.gov.OU
+
 # ignore compile files
 *.a
 *.mod
@@ -27,3 +30,7 @@ misc/*
 *.tar.gz
 *.tar
 *.tgz
+
+# Ignore compiled files
+bin.rams/rams
+bin.rams/rams-6.*
