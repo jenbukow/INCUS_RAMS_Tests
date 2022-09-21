@@ -147,6 +147,7 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
             ,radiate_g(ngrid)%albedt  (1,1)    &
             ,radiate_g(ngrid)%cosz    (1,1)    &
             ,radiate_g(ngrid)%rlongup (1,1)    &
+            ,radiate_g(ngrid)%rlontop (1,1)    &
             ,radiate_g(ngrid)%rshort  (1,1)    &
             ,radiate_g(ngrid)%rlong   (1,1)    &
             ,radiate_g(ngrid)%aodt    (1,1)    &
@@ -460,7 +461,7 @@ END SUBROUTINE radcomp
 
 !##############################################################################
 Subroutine radcomp3 (m1,m2,m3,ia,iz,ja,jz  &
-   ,glat,rtgt,topt,albedt,cosz,rlongup,rshort,rlong,aodt  &
+   ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt  &
    ,rv,dn0,fthrd,pi0,pp,theta,rcp &
    ,bext,swup,swdn,lwup,lwdn &
    ,cccnp,cccmp,gccnp,gccmp,md1np,md1mp,md2np,md2mp &
@@ -480,7 +481,8 @@ implicit none
 integer :: m1,m2,m3,ia,iz,ja,jz,mcat,i,j,k
 
 real :: cfmasi,cparmi,glg,glgm,picpi
-real, dimension(m2,m3) :: glat,rtgt,topt,cosz,albedt,rlongup,rshort,rlong,aodt
+real, dimension(m2,m3) :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop &
+  ,rshort,rlong,aodt
 real, dimension(m1,m2,m3) :: dn0,rv,fthrd,pi0,pp,theta,rcp
 real, dimension(m1,m2,m3) :: bext,swup,swdn,lwup,lwdn
 real, dimension(m1,m2,m3) :: cccnp,cccmp,gccnp,gccmp,md1np,md1mp,md2np,md2mp &
@@ -553,6 +555,7 @@ do j = ja,jz
          ,albedt(i,j)          &
          ,cosz(i,j)            &
          ,rlongup(i,j)         &
+         ,rlontop(i,j)         &
          ,rshort(i,j)          &
          ,rlong(i,j)           &
          ,aodt(i,j)            &
@@ -654,7 +657,7 @@ END SUBROUTINE zen
 
 !##############################################################################
 Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
-   ,glat,rtgt,topt,rv,albedt,cosz,rlongup,rshort,rlong,aodt &
+   ,glat,rtgt,topt,rv,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt &
    ,fthrd,bext,swup,swdn,lwup,lwdn &
    ,dn0 &
    )
@@ -710,6 +713,7 @@ Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
 !  albedt           : surface albedo
 !  cosz             : solar zenith angle
 !  rlongup          : upward longwave radiation at surface (W/m^2)
+!  rlontop          : upward longwave radiation at at the top radiation level (W/m^2)
 !  rshort           : downward shortwave radiation at surface (W/m^2)
 !  rlong            : downward longwave radiation at surface (W/m^2)
 !  aodt             : total aerosol optical depth (band=3)
@@ -836,7 +840,7 @@ integer, save :: ngass(mg)=(/1, 1, 1/),ngast(mg)=(/1, 1, 1/)
 !       ngas(3) =  O3
 
 real, save :: eps=1.e-15
-real :: glat,rtgt,topt,cosz,albedt,rlongup,rshort,rlong,aodt
+real :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop,rshort,rlong,aodt
 real :: zm(m1),zt(m1),dn0(m1),rv(m1),fthrd(m1)
 real :: bext(m1),swup(m1),swdn(m1),lwup(m1),lwdn(m1)
 
@@ -986,6 +990,9 @@ if (ilwrtyp == 3) then
 
    !Set rlong to surface level downward longwave flux.
    rlong = flxdl(1)
+
+   ! Save upwelling longwave radiation (OLR) at top radiation level
+   rlontop = flxul(nrad)
 
    !Make lowest level upward longwave flux equal to rlongup
    !produced from land surface models (LEAF,SiB).

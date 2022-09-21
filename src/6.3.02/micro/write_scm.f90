@@ -139,6 +139,7 @@ if(iswrtyp == 3 .or. ilwrtyp == 3) then
  CALL iofil ('rshort.txt' ,radiate_g(ng)%rshort (i,j),1,wf,fln)
  CALL iofil ('rlong.txt'  ,radiate_g(ng)%rlong  (i,j),1,wf,fln)
  CALL iofil ('rlongup.txt',radiate_g(ng)%rlongup(i,j),1,wf,fln)
+ CALL iofil ('rlontop.txt',radiate_g(ng)%rlontop(i,j),1,wf,fln)
  CALL iofil ('albedt.txt' ,radiate_g(ng)%albedt (i,j),1,wf,fln)
  CALL iofil ('cosz.txt'   ,radiate_g(ng)%cosz   (i,j),1,wf,fln)
  CALL iofil ('aodt.txt'   ,radiate_g(ng)%aodt   (i,j),1,wf,fln)

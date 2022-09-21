@@ -275,6 +275,7 @@ if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
          ,radiate%albedt (i,j)    &
          ,radiate%cosz   (i,j)    &
          ,radiate%rlongup(i,j)    &
+         ,radiate%rlontop(i,j)    &
          ,radiate%rshort (i,j)    &
          ,radiate%rlong  (i,j)    &
          ,radiate%aodt   (i,j)    &

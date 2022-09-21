@@ -4535,21 +4535,21 @@ elseif(cvar(1:lv).eq.'column_net_rad_flx') then
    ivar_type=2
    allocate (pv1(nnxp(ngrd),nnyp(ngrd),nnzp(ngrd)))
    allocate (pv2(nnxp(ngrd),nnyp(ngrd),nnzp(ngrd)))
-   allocate (pv3(nnxp(ngrd),nnyp(ngrd),nnzp(ngrd)))
    allocate (dv1(nnxp(ngrd),nnyp(ngrd)))
    allocate (dv2(nnxp(ngrd),nnyp(ngrd)))
    allocate (dv3(nnxp(ngrd),nnyp(ngrd)))
    allocate (dv4(nnxp(ngrd),nnyp(ngrd)))
+   allocate (dv5(nnxp(ngrd),nnyp(ngrd)))
    ierr=rams_getvar('SWUP',   idim_type,ngrd,pv1,flnm) !atmos shortwave up
-   ierr=rams_getvar('LWUP',   idim_type,ngrd,pv2,flnm) !atmos longwave up
-   ierr=rams_getvar('SWDN',   idim_type,ngrd,pv3,flnm) !atmos shortwave down
+   ierr=rams_getvar('SWDN',   idim_type,ngrd,pv2,flnm) !atmos shortwave down
    ierr=rams_getvar('RSHORT', idim_type,ngrd,dv1,flnm) !surface shortwave down
    ierr=rams_getvar('RLONG',  idim_type,ngrd,dv2,flnm) !surface longwave down
    ierr=rams_getvar('RLONGUP',idim_type,ngrd,dv3,flnm) !surface longwave up
-   ierr=rams_getvar('ALBEDT', idim_type,ngrd,dv4,flnm) !surface albdeo
+   ierr=rams_getvar('RLONTOP',idim_type,ngrd,dv4,flnm) !longwave up at model top
+   ierr=rams_getvar('ALBEDT', idim_type,ngrd,dv5,flnm) !surface albdeo
    CALL rams_net_rad_flx (nnxp(ngrd),nnyp(ngrd),nnzp(ngrd),a &
-     ,pv1,pv2,pv3,dv1,dv2,dv3,dv4)
-   deallocate (pv1,pv2,pv3,dv1,dv2,dv3,dv4)
+     ,pv1,pv2,dv1,dv2,dv3,dv4,dv5)
+   deallocate (pv1,pv2,dv1,dv2,dv3,dv4,dv5)
    cdname='column-net-radiative-flux;'
    cdunits='W/m2;'
 
@@ -5326,6 +5326,12 @@ elseif(cvar(1:lv).eq.'rlongup') then
    ivar_type=2
    ierr=rams_getvar('RLONGUP',idim_type,ngrd,a,flnm)
    cdname='rlongup;'
+   cdunits='W/m2;'
+
+elseif(cvar(1:lv).eq.'rlontop') then
+   ivar_type=2
+   ierr=rams_getvar('RLONTOP',idim_type,ngrd,a,flnm)
+   cdname='rlontop;'
    cdunits='W/m2;'
 
 elseif(cvar(1:lv).eq.'albedt') then
