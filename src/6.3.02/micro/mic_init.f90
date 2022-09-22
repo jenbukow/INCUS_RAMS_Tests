@@ -199,13 +199,15 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
 real, dimension(n1,n2,n3) :: cccnp,cccmp,dn0
-real :: ccn_maxt
+real :: ccn_maxt,ccn_ftt
+real :: ft_hgt ! PJM - height of free tropsophere (boundary layer height + transition depth)
 
 ! Initialize CCN
 if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN concentration'
 
 !Convert RAMSIN #/mg to #/kg
  ccn_maxt = ccn_max * 1.e6 
+ ccn_ftt = ccn_ft * 1.e6
 
 do j = 1,n3
  do i = 1,n2
@@ -213,8 +215,29 @@ do j = 1,n3
 
    !Set up Vertical profile
    if(k<=2) cccnp(k,i,j)=ccn_maxt
-   !Exponential decrease that scales with pressure decrease
-   if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+     
+     if(iccn_prof==1) then
+       !Exponential decrease that scales with pressure decrease
+       if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+
+     ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
+     elseif(iccn_prof==2) then
+       !More realistic profile, with constant ccn in boundary layer, decreasing to a free
+       !troposphere value, and decreasing to the model top
+       !Note: requires roughly constant boundary layer throughout simulation time
+       ft_hgt = bl_hgt + tran_depth ! Calculate free troposphere height
+
+       if(zt(k)<=bl_hgt) cccnp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+
+       ! Linear decrease during transition depth to free tropospheric value
+       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  cccnp(k,i,j) = (ccn_maxt - &
+         ((ccn_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
+
+       ! Linear decrease from free troposphere to 0 to the model top
+       if(zt(k)> ft_hgt) cccnp(k,i,j) = (ccn_ftt - (ccn_ftt * & 
+           (zt(k) - ft_hgt) / (zt(n1) - ft_hgt))) 
+     
+     endif
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
@@ -510,13 +533,15 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm,nsc,ii,jj
 real, dimension(n1,n2,n3) :: tracerp,dn0
-real :: ccn_maxt
+real :: ccn_maxt,ccn_ftt
+real :: ft_hgt ! PJM - height of free tropsophere (boundary layer height + transition depth)
 
 ! Initialize Tracers
 if(print_msg) print*,'Start Initializing Tracers, Grid:',ifm,' Tracer:',nsc
 
 !Convert RAMSIN #/mg to #/kg
  ccn_maxt = ccn_max * 1.e6 
+ ccn_ftt = ccn_ft * 1.e6
 
 do j = 1,n3
  do i = 1,n2
@@ -526,11 +551,35 @@ do j = 1,n3
    ii = i+mi0(ngrid)
    jj = j+mj0(ngrid)
 
-   !Set up Vertical profile, Exponential decrease that scales with pressure
+   !Set up Vertical profile
    if(nsc==1) then
     if(k<=2) tracerp(k,i,j)=ccn_maxt
-    if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+    
+     if(iccn_prof==1) then
+       !Exponential decrease that scales with pressure decrease
+       if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+
+     ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
+     elseif(iccn_prof==2) then
+       !More realistic profile, with constant ccn in boundary layer, decreasing to a free
+       !troposphere value, and decreasing to the model top
+       !Note: requires roughly constant boundary layer throughout simulation time
+       ft_hgt = bl_hgt + tran_depth ! Calculate free troposphere height
+
+       if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+
+       ! Linear decrease during transition depth to free tropospheric value
+       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  tracerp(k,i,j) = (ccn_maxt - &
+         ((ccn_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
+
+       ! Linear decrease from free troposphere to 0 to the model top
+       if(zt(k)> ft_hgt) tracerp(k,i,j) = (ccn_ftt - (ccn_ftt * & 
+           (zt(k) - ft_hgt) / (zt(n1) - ft_hgt))) 
+     
+     endif
+
    endif
+
    !Set up Field of CCN mass mixing ratio (kg/kg)
    if(nsc==2) then
     tracerp(k,i,j) = ((aero_medrad(1)*aero_rg2rm(1))**3.) &

@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=37,nvstrt=77,nvindat=145,nvsound=10
+integer, parameter ::nvgrid=37,nvstrt=77,nvindat=149,nvsound=10
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -71,7 +71,8 @@ DATA INDAT/  &
      ,'IGRAUP','IHAIL','CPARM','DPARM','RPARM','PPARM','SPARM','APARM'   &
      ,'GPARM','HPARM','GNU','HUCMFILE','NDTCOLL','IAEROSOL','ISALT'      &
      ,'IDUST','IDUSTLOFT','DUSTFILE','ICCNLEV','IIFN','IIFN_FORMULA'     &
-     ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN_MAX'  &
+     ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','ICCN_PROF'&
+     ,'CCN_MAX','BL_HGT','TRAN_DEPTH','CCN_FT'                           &
      ,'GCCN_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
      ,'SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'              &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
@@ -361,7 +362,11 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'IAEROPRNT')    CALL varseti (VR,IAEROPRNT,NV,1,II,0,1)
  IF(VR.EQ.'IAEROHIST')    CALL varseti (VR,IAEROHIST,NV,1,II,0,1)
  IF(VR.EQ.'CIN_MAX')      CALL varsetf (VR,CIN_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'ICCN_PROF')    CALL varseti (VR,ICCN_PROF,NV,1,II,1,2)
  IF(VR.EQ.'CCN_MAX')      CALL varsetf (VR,CCN_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'BL_HGT')       CALL varsetf (VR,BL_HGT,NV,1,FF,0.,10000.)
+ IF(VR.EQ.'TRAN_DEPTH')   CALL varsetf (VR,TRAN_DEPTH,NV,1,FF,0.,10000.)
+ IF(VR.EQ.'CCN_FT')       CALL varsetf (VR,CCN_FT,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'GCCN_MAX')     CALL varsetf (VR,GCCN_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST1_MAX')    CALL varsetf (VR,DUST1_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST2_MAX')    CALL varsetf (VR,DUST2_MAX,NV,1,FF,0.,1.E4)
@@ -529,7 +534,8 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'ISALT=',ISALT                     &
  ,'IDUST=',IDUST                     &
  ,'IDUSTLOFT=',IDUSTLOFT             &
- ,'ICCNLEV=',ICCNLEV                 &
+ ,'ICCNLEV=',ICCNLEV                 & 
+ ,'ICCN_PROF=',ICCN_PROF             &
  ,'IIFN=',IIFN                       &
  ,'IIFN_FORMULA=',IIFN_FORMULA       &
  ,'IAERORAD=',IAERORAD               &
@@ -605,6 +611,9 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'HPARM=',HPARM                     &
  ,'CIN_MAX=',CIN_MAX                 &
  ,'CCN_MAX=',CCN_MAX                 &
+ ,'BL_HGT=',BL_HGT                   &
+ ,'TRAN_DEPTH=',TRAN_DEPTH           &
+ ,'CCN_FT=',CCN_FT                   &
  ,'GCCN_MAX=',GCCN_MAX               &
  ,'DUST1_MAX=',DUST1_MAX             &
  ,'DUST2_MAX=',DUST2_MAX             &

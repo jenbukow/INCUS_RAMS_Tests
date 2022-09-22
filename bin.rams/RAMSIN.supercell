@@ -575,8 +575,13 @@
                              ! ------------------------------------------
    IAEROPRNT  = 1,           ! Print aerosol init profiles (0=no,1=yes)
    IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 
+   ICCN_PROF  = 2,           ! CCN Profile Type
+                             ! 1 = Exponential, using default 7000 m scale height
+                             ! 2 = Decreasing based on atmospheric levels (Boundary Layer, Transition, Free Troposphere) 
+   CCN_MAX    = 1000.,       ! CCN at surface (#/mg) 
+   BL_HGT     = 2000.,       ! Boundary layer height (m) - for CCN_PROF=2
+   TRAN_DEPTH = 1000.,       ! Transition depth (linear) for BL -> FT ccn conc. (m) - for CCN_PROF=2
    CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg)
-   CCN_MAX    = 1000.,       ! CCN (#/mg)
    GCCN_MAX   = 0.01,        ! Giant-CCN (#/mg)
    DUST1_MAX  = 100.,        ! Small Dust Mode (#/mg)
    DUST2_MAX  = 10.,         ! Large Dust Mode (#/mg)
