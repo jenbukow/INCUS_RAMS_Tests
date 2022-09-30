@@ -217,6 +217,11 @@
 
    LITE_VARS= 'GLAT','GLON','TOPT','PATCH_AREA', !Keep these always
               'UP','VP','WP', !This would be useful for hi-frequency trajectories
+   ! Accuracy of the lite vars if using ZFP/lossy compression
+   ! Use 0 for lossless compression
+   ! Using nonzero values requires compiling with -DENABLE_ZFP_COMPRESSION
+   ! on the C compiler.
+   ACC_LT_VAR= 0., 0., 0., 0., 0., 0., 0.,
 
 !-----------------------------------------------------------------------
    AVGTIM   = 0.,            ! Averaging time for analysis variables
