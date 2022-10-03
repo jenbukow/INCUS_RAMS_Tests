@@ -11,7 +11,7 @@ implicit none
                           
       ! Variables to be dimensioned by (nxp,nyp)
    real, allocatable, dimension(:,:) :: &
-                          rshort,rlong,rlongup,albedt,cosz,aodt
+                          rshort,rlong,rlongup,rlontop,albedt,cosz,aodt
 
    End Type
    
@@ -38,6 +38,7 @@ implicit none
                          allocate (radiate%rshort(n2,n3))
                          allocate (radiate%rlong(n2,n3))
                          allocate (radiate%rlongup(n2,n3))
+                         allocate (radiate%rlontop(n2,n3))
                          allocate (radiate%albedt(n2,n3))
                          allocate (radiate%cosz(n2,n3))
                          allocate (radiate%aodt(n2,n3))
@@ -69,6 +70,7 @@ implicit none
    if (allocated(radiate%rshort))   deallocate (radiate%rshort)
    if (allocated(radiate%rlong))    deallocate (radiate%rlong)
    if (allocated(radiate%rlongup))  deallocate (radiate%rlongup)
+   if (allocated(radiate%rlontop))  deallocate (radiate%rlontop)
    if (allocated(radiate%albedt))   deallocate (radiate%albedt)
    if (allocated(radiate%cosz))     deallocate (radiate%cosz)
    if (allocated(radiate%aodt))     deallocate (radiate%aodt)
@@ -135,6 +137,10 @@ implicit none
       CALL vtables2 (radiate%rlongup(1,1),radiatem%rlongup(1,1)  &
                  ,ng, npts, imean,  &
                  'RLONGUP :2:anal:mpti')
+   if (allocated(radiate%rlontop))  &
+      CALL vtables2 (radiate%rlontop(1,1),radiatem%rlontop(1,1)  &
+                 ,ng, npts, imean,  &
+                 'RLONTOP :2:anal:mpti')
    if (allocated(radiate%albedt))  &
       CALL vtables2 (radiate%albedt(1,1),radiatem%albedt(1,1)  &
                  ,ng, npts, imean,  &

@@ -2215,14 +2215,14 @@ return
 END SUBROUTINE rams_reduced_wind
 
 !##############################################################################
-Subroutine rams_net_rad_flx (n1,n2,n3,netflx,swup,lwup,swdn,rshort,rlong  &
-                            ,rlongup,albedt)
+Subroutine rams_net_rad_flx (n1,n2,n3,netflx,swup,swdn,rshort,rlong  &
+                            ,rlongup,rlontop,albedt)
 
 implicit none
 
 integer :: n1,n2,n3,i,j
-real, dimension(n1,n2) :: netflx,rshort,rlong,rlongup,albedt
-real, dimension(n1,n2,n3) :: swup,lwup,swdn
+real, dimension(n1,n2) :: netflx,rshort,rlong,rlongup,rlontop,albedt
+real, dimension(n1,n2,n3) :: swup,swdn
 real :: netuptoa,netupsfc,rshortup
 
 !Note: + values indicate cooling
@@ -2230,9 +2230,9 @@ real :: netuptoa,netupsfc,rshortup
 
 do j=1,n2
    do i=1,n1
-     netuptoa = swup(i,j,n3) + lwup(i,j,n3) - swdn(i,j,n3)
+     netuptoa = swup(i,j,n3) + rlontop(i,j) - swdn(i,j,n3)
      rshortup = rshort(i,j) * albedt(i,j)
-     netupsfc = (rshortup + lwup(i,j,1)) - (rshort(i,j) + rlong(i,j))
+     netupsfc = (rshortup + rlongup(i,j)) - (rshort(i,j) + rlong(i,j))
      netflx(i,j)= netuptoa - netupsfc
    enddo
 enddo
