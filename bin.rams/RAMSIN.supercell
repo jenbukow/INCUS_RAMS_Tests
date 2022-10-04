@@ -582,10 +582,14 @@
    IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 
    ICCN_PROF  = 2,           ! CCN Profile Type
                              ! 1 = Exponential, using default 7000 m scale height
-                             ! 2 = Decreasing based on atmospheric levels (Boundary Layer, Transition, Free Troposphere) 
+                             ! 2 = Constant in the Boundary Layer, Exponential above with a 3500 m scale height
+                             ! 3 = Constant in the Boundary Layer, Linear Decreasing to Free Tropospheric Value,
+                             !     then Linear Decrease to Model Top 
+                                
    CCN_MAX    = 1000.,       ! CCN at surface (#/mg) 
    BL_HGT     = 2000.,       ! Boundary layer height (m) - for CCN_PROF=2
-   TRAN_DEPTH = 1000.,       ! Transition depth (linear) for BL -> FT ccn conc. (m) - for CCN_PROF=2
+   TRAN_DEPTH = 1000.,       ! Transition depth (linear) for BL -> FT ccn conc. (m) - for CCN_PROF=3
+   CCN_FT     = 100.,        ! Free Tropospheric CCN Concentration - for CCN_PROF=3
    CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg)
    GCCN_MAX   = 0.01,        ! Giant-CCN (#/mg)
    DUST1_MAX  = 100.,        ! Small Dust Mode (#/mg)

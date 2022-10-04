@@ -221,10 +221,16 @@ do j = 1,n3
        if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
-     elseif(iccn_prof==2) then
+     if(iccn_prof==2) then
+       !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
+       if(zt(k)<=bl_hgt) cccnp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+
+       if(zt(k)>bl_hgt)  cccnp(k,i,j) = ccn_maxt * exp(-zt(k)/3500.) ! Exponential decrease that scales with height 
+
+     ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
+     elseif(iccn_prof==3) then
        !More realistic profile, with constant ccn in boundary layer, decreasing to a free
        !troposphere value, and decreasing to the model top
-       !Note: requires roughly constant boundary layer throughout simulation time
        ft_hgt = bl_hgt + tran_depth ! Calculate free troposphere height
 
        if(zt(k)<=bl_hgt) cccnp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
@@ -560,7 +566,14 @@ do j = 1,n3
        if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
-     elseif(iccn_prof==2) then
+     if(iccn_prof==2) then
+       !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
+       if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+
+       if(zt(k)>bl_hgt)  tracerp(k,i,j) = ccn_maxt * exp(-zt(k)/3500.) ! Exponential decrease that scales with height 
+
+     ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
+     elseif(iccn_prof==3) then
        !More realistic profile, with constant ccn in boundary layer, decreasing to a free
        !troposphere value, and decreasing to the model top
        !Note: requires roughly constant boundary layer throughout simulation time
