@@ -221,7 +221,7 @@ do j = 1,n3
        if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
-     if(iccn_prof==2) then
+     elseif(iccn_prof==2) then
        !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
        if(zt(k)<=bl_hgt) cccnp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
 
@@ -566,7 +566,7 @@ do j = 1,n3
        if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
-     if(iccn_prof==2) then
+     elseif(iccn_prof==2) then
        !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
        if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
 
