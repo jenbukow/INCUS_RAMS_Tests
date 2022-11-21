@@ -1,17 +1,54 @@
 !##############################################################################
-Subroutine nstbtnd (m1,m2,m3,ia,iz,ja,jz,ibcon  &
+Subroutine nstbtnd (m1,m2,m3,ia,iz,ja,jz,ibcon,ngrid  &
      ,scp,sct,bx,by,bz,vnam,tymeinv,nstbot,nsttop,jdim)
+
+use node_mod, only: mi0, mj0
 
 implicit none
 
-integer :: m1,m2,m3,ia,iz,ja,jz,ibcon,nstbot,nsttop,jdim,i,j,k  &
-   ,nzfm,nxfm,nyfm,incia,inciz,incja,incjz
+integer :: m1,m2,m3,ia,iz,ja,jz,ibcon,ngrid,nstbot,nsttop,jdim  &
+   ,i,j,k,nzfm,nxfm,nyfm,incia,inciz,incja,incjz
 real :: tymeinv
 real, dimension(m1,m2,m3) :: scp,sct
 real, dimension(m1,m3,2) :: bx
 real, dimension(m1,m2,2) :: by
 real, dimension(m2,m3,2) :: bz
 character(len=*) :: vnam
+
+! locally defined variables for sponge code
+integer :: npts_sponge &! user-defined number of points in the sponge zone
+                        ! ** IMPORTANT ** code not implemented to have this
+                        ! nudging zone distance be greater than the size of 
+                        ! the parallelized subdomain. Addressing this would   
+                        ! require MPI message passing code modifications.
+           ,ispg, jspg  ! counters for sponge zone
+real :: tau_sponge & ! user-defined sponge zone time scale in seconds
+        ,itau_spg  & ! inverse sponge zone time scale
+        ,wgt_spg     ! weight for distance from the boundary edge
+
+! ** NOTE ** Corners are being double-counted, so tendencies there are too strong
+!   Fix this by modeling after varfile nudging code
+! ** NOTE ** Would probably be best practice to have b arrays contain more information
+!   through width of sponge zone, instead of nudging entire sponge zone to one boundary
+!   value. This becomes even more important if sponge zone width is increased beyond
+!   5-10 points! However, also note that b arrays only have non-zero values for sub-domains
+!   containing a boundary.
+! ** NOTE ** still to do: make weights quadratic function
+
+
+! set up sponge zone time scale and calculate inverse nudging timescale
+tau_sponge = 30. ! s
+itau_spg = 1./tau_sponge
+! set up number of points in the sponge zone. Can vary for different grids
+! Here, use 5 points on grid2 and 8 points on grid3
+npts_sponge = 5
+if (ngrid .eq. 3) npts_sponge = 8
+
+! debugging
+!if (vnam.eq.'u' .and. ngrid.eq.3 .and. mj0(ngrid).eq.18) then
+!  print*,"u, grid3: i=1+i0,      j=3+j0,      k=30,   bx(30,3,1)(west bdy), bx(30,3,2)(east bdy):"
+!  print*,           1+mi0(ngrid),3+mj0(ngrid),30,     bx(30,3,1),           bx(30,3,2)
+!endif
 
 nzfm = m1
 nxfm = iz + 1
@@ -30,6 +67,7 @@ incjz = 0
 if (iand(ibcon,4) .ne. 0) incja = jdim
 if (iand(ibcon,8) .ne. 0 .and. vnam .ne. 'v') incjz = jdim
 
+! bottom boundary
 if (nstbot .eq. 0) then
   do j = ja,jz
     do i = ia,iz
@@ -37,6 +75,7 @@ if (nstbot .eq. 0) then
     enddo
   enddo
 endif
+! top boundary
 if (nsttop .eq. 0) then
   do j = ja,jz
     do i = ia,iz
@@ -45,34 +84,129 @@ if (nsttop .eq. 0) then
   enddo
 endif
 
-if (iand(ibcon,1) .ne. 0) then
-   do j = ja-incja,jz+incjz
-      do k = 1,m1
-         sct(k,1,j) = (bx(k,j,1) - scp(k,1,j)) * tymeinv
+! west boundary
+if (iand(ibcon,1) .ne. 0) then ! this subdomain is on the boundary
+   ! check that the length of this subdomain is not smaller than the sponge zone width
+   if (iz<npts_sponge) then
+      print*, 'In subroutine nstbtnd: subdomain x-dimension length is smaller than sponge zone'
+      print*, 'Stopping model'
+      stop
+   endif
+   do j = ja-incja,jz+incjz ! loop through all j points along this subdomain boundary
+      do k = 1,m1 ! loop through all vertical levels in this j column
+         ! set scalar tendency for i=1:npts_sponge based on the difference between the
+         ! west border value interpolated from the parent nest (bx(k,j,1)) 
+         ! and the scalar itself, divided by the sponge zone time scale to produce a tendency
+         do ispg = 1,npts_sponge
+            ! linearly decreasing weight away from the edge
+            wgt_spg = 1. - ( float(ispg-1)/float(npts_sponge) )
+            ! calculate scalar tendency in the sponge zone
+            sct(k,ispg,j) = sct(k,ispg,j) &
+                            + wgt_spg * (bx(k,j,1) - scp(k,ispg,j)) * itau_spg
+            ! TEMPORARY - print some stuff
+            !if((j.eq.ja-incja) .and. (k.eq.1)) then
+            !   print*, 'W boundary,ja,k1: vnam, ispg, wgt_spg, idx, bx(k,j,1), scp, sct'
+            !   print*, vnam, ispg, wgt_spg, ispg, bx(k,j,1), scp(k,ispg,j), sct(k,ispg,j)
+            !endif
+         enddo
+         ! below is the old code which sets only the boundary value to bx. tymeinv is a
+         ! fractional timestep based on which integration this is relative to the parent grid.
+         !sct(k,1,j) = (bx(k,j,1) - scp(k,1,j)) * tymeinv
       enddo
    enddo
 endif
 
-if (iand(ibcon,2) .ne. 0) then
-   do j = ja-incja,jz+incjz
-      do k = 1,m1
-         sct(k,nxfm,j) = (bx(k,j,2) - scp(k,nxfm,j)) * tymeinv
+! east boundary
+if (iand(ibcon,2) .ne. 0) then ! this subdomain is on the boundary
+   ! check that the length of this subdomain is not smaller than the sponge zone width
+   if (iz<npts_sponge) then
+      print*, 'In subroutine nstbtnd: subdomain x-dimension length is smaller than sponge zone'
+      print*, 'Stopping model'
+      stop
+   endif
+   do j = ja-incja,jz+incjz ! loop through all j points along this subdomain boundary
+      do k = 1,m1 ! loop through all vertical levels in this j column
+         ! set scalar tendency for <npts_sponge> points based on the difference between the
+         ! east border value interpolated from the parent nest (bx(k,j,2)) 
+         ! and the scalar itself, divided by the sponge zone time scale to produce a tendency
+         do ispg = 1,npts_sponge
+            ! linearly decreasing weight away from the edge
+            wgt_spg = 1. - ( float(ispg-1)/float(npts_sponge) )
+            ! calculate scalar tendency in the sponge zone
+            ! index backward from the east edge to properly account for wgt_spg factor
+            sct(k,nxfm-ispg+1,j) = sct(k,nxfm-ispg+1,j) &
+                                   + wgt_spg * (bx(k,j,2) - scp(k,nxfm-ispg+1,j)) * itau_spg
+            ! TEMPORARY - print some stuff
+            !if((j.eq.jz+incjz) .and. (k.eq.10)) then
+            !   print*, 'E boundary,jz,k10: vnam, ispg, wgt_spg, idx, bx(k,j,2), scp, sct'
+            !   print*, vnam, ispg, wgt_spg, nxfm-ispg+1, bx(k,j,2), scp(k,nxfm-ispg+1,j), sct(k,nxfm-ispg+1,j)
+            !endif
+         enddo
+         ! below is the old code which sets only the boundary value to bx
+         !sct(k,nxfm,j) = (bx(k,j,2) - scp(k,nxfm,j)) * tymeinv
       enddo
    enddo
 endif
 
 if (jdim .eq. 1) then
-   if (iand(ibcon,4) .ne. 0) then
-      do i = ia-incia,iz+inciz
-         do k = 1,m1
-            sct(k,i,1) = (by(k,i,1) - scp(k,i,1)) * tymeinv
+   ! south boundary
+   if (iand(ibcon,4) .ne. 0) then ! this subdomain is on the boundary
+      ! check that the length of this subdomain is not smaller than the sponge zone width
+      if (jz<npts_sponge) then
+         print*, 'In subroutine nstbtnd: subdomain y-dimension length is smaller than sponge zone'
+         print*, 'Stopping model'
+         stop
+      endif
+      do i = ia-incia,iz+inciz ! loop through all i points along this subdomain boundary
+         do k = 1,m1 ! loop through all vertical levels in this i column
+            ! set scalar tendency for j=1:npts_sponge based on the difference between the
+            ! south border value interpolated from the parent nest (by(k,i,1)) 
+            ! and the scalar itself, divided by the sponge zone time scale to produce a tendency
+            do jspg = 1,npts_sponge
+               ! linearly decreasing weight away from the edge
+               wgt_spg = 1. - ( float(jspg-1)/float(npts_sponge) )
+               ! calculate scalar tendency in the sponge zone
+               sct(k,i,jspg) = sct(k,i,jspg) &
+                               + wgt_spg * (by(k,i,1) - scp(k,i,jspg)) * itau_spg
+               ! TEMPORARY - print some stuff
+               !if((i.eq.ia-incia) .and. (k.eq.1)) then
+               !   print*, 'S boundary,ia,k1: vnam, jspg, wgt_spg, idx, by(k,i,1), scp, sct'
+               !   print*, vnam, jspg, wgt_spg, jspg, by(k,i,1), scp(k,i,jspg), sct(k,i,jspg)
+               !endif
+            enddo
+            ! below is the old code which sets only the boundary value to by
+            !sct(k,i,1) = (by(k,i,1) - scp(k,i,1)) * tymeinv
          enddo
       enddo
    endif
-   if (iand(ibcon,8) .ne. 0) then
-      do i = ia-incia,iz+inciz
-         do k = 1,m1
-            sct(k,i,nyfm) = (by(k,i,2) - scp(k,i,nyfm)) * tymeinv
+   ! north boundary
+   if (iand(ibcon,8) .ne. 0) then ! this subdomain is on the boundary
+      ! check that the length of this subdomain is not smaller than the sponge zone width
+      if (jz<npts_sponge) then
+         print*, 'In subroutine nstbtnd: subdomain y-dimension length is smaller than sponge zone'
+         print*, 'Stopping model'
+         stop
+      endif
+      do i = ia-incia,iz+inciz ! loop through all i points along this subdomain boundary
+         do k = 1,m1 ! loop through all vertical levels in this i column
+            ! set scalar tendency for <npts_sponge> points based on the difference between the
+            ! north border value interpolated from the parent nest (by(k,i,2)) 
+            ! and the scalar itself, divided by the sponge zone time scale to produce a tendency
+            do jspg = 1,npts_sponge
+               ! linearly decreasing weight away from the edge
+               wgt_spg = 1. - ( float(jspg-1)/float(npts_sponge) )
+               ! calculate scalar tendency in the sponge zone
+               ! index backward from the north edge to properly account for wgt_spg factor
+               sct(k,i,nyfm-jspg+1) = sct(k,i,nyfm-jspg+1) &
+                                      + wgt_spg * (by(k,i,2) - scp(k,i,nyfm-jspg+1)) * itau_spg
+               ! TEMPORARY - print some stuff
+               !if((i.eq.iz+inciz) .and. (k.eq.10)) then
+               !   print*, 'N boundary,iz,k10: vnam, jspg, wgt_spg, idx, by(k,i,2), scp, sct'
+               !   print*, vnam, jspg, wgt_spg, nyfm-jspg+1, by(k,i,2), scp(k,i,nyfm-jspg+1), sct(k,i,nyfm-jspg+1)
+               !endif
+            enddo
+            ! below is the old code which sets only the boundary value to by
+            !sct(k,i,nyfm) = (by(k,i,2) - scp(k,i,nyfm)) * tymeinv
          enddo
       enddo
    endif
