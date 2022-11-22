@@ -34,7 +34,6 @@ real, dimension(m2,m3) :: wgtW,wgtE,wgtS,wgtN
 !   value. This becomes even more important if sponge zone width is increased beyond
 !   5-10 points! However, also note that b arrays only have non-zero values for sub-domains
 !   containing a boundary.
-! ** NOTE ** still to do: make weights quadratic function
 ! ** NOTE ** move tau_sponge and npts_sponge to namelist, make them grid-dependent
 
 
@@ -90,30 +89,13 @@ if (iand(ibcon,4) .ne. 0) incja = jdim ! S boundary
 if (iand(ibcon,8) .ne. 0 .and. vnam .ne. 'v') incjz = jdim ! N boundary, non-normal wind
 
 
-! Set up weight array properly accounting for corners. For linear weighting and
-! 4 pt nudging zone, this will look like the following example for the NW corner.
-
-! Contributions from W nudging (not yet accounting for total weight):
-! 1.0 .75 .50 .25 0.0 0.0
-! 1.0 .75 .50 .25 0.0 0.0
-! 1.0 .75 .50 .25 0.0 0.0
-! 1.0 .75 .50 .25 0.0 0.0
-! 1.0 .75 .50 .25 0.0 0.0
-! 1.0 .75 .50 .25 0.0 0.0
-
-! Contributions from N nudging (not yet accounting for total weight):
-! 1.0 1.0 1.0 1.0 1.0 1.0
-! .75 .75 .75 .75 .75 .75
-! .50 .50 .50 .50 .50 .50
-! .25 .25 .25 .25 .25 .25
-! 0.0 0.0 0.0 0.0 0.0 0.0
-! 0.0 0.0 0.0 0.0 0.0 0.0
-
-! So, make four different weights arrays, one each for N,S,E,W, and check 
+! Set up weight array properly accounting for corners. 
+! Make four different weights arrays, one each for N,S,E,W, and check 
 ! if their sum is > 1. If so, normalize each weight so they add up to 1. 
-! Then this will look like:
+! For a linear weight and 4-point nudging zone, this will look like 
+! the following example for the NW corner:
 
-! Contributions from W nudging:
+! NW corner, Contributions from W nudging:
 ! .50 .43 .33 .20 0.0 0.0
 ! .57 .50 .40 .25 0.0 0.0
 ! .63 .60 .50 .25 0.0 0.0
@@ -121,7 +103,7 @@ if (iand(ibcon,8) .ne. 0 .and. vnam .ne. 'v') incjz = jdim ! N boundary, non-nor
 ! 1.0 .75 .50 .25 0.0 0.0
 ! 1.0 .75 .50 .25 0.0 0.0
 
-! Contributions from N nudging:
+! NW corner, Contributions from N nudging:
 ! .50 .57 .63 .80 1.0 1.0
 ! .43 .50 .60 .75 .75 .75
 ! .33 .40 .50 .50 .50 .50
@@ -129,7 +111,7 @@ if (iand(ibcon,8) .ne. 0 .and. vnam .ne. 'v') incjz = jdim ! N boundary, non-nor
 ! 0.0 0.0 0.0 0.0 0.0 0.0
 ! 0.0 0.0 0.0 0.0 0.0 0.0
 
-! Total nudging:
+! Total nudging weight:
 ! 1.0 1.0 1.0 1.0 1.0 1.0
 ! 1.0 1.0 1.0 1.0 .75 .75
 ! 1.0 1.0 1.0 .75 .50 .50
@@ -153,21 +135,22 @@ do j = 1,m3
     wgtN(i,j) = 0.
  enddo
 enddo
+! Set up quadratic weight functions
 do j = 1,m3
   do i = 1,m2
     ! W boundary weight
     numer = max( 0., float( npts_sponge + 1-(i+mi0(ngrid)) ) )
-    wgtW(i,j) = numer/float(npts_sponge)
+    wgtW(i,j) = numer*numer/float(npts_sponge*npts_sponge)
     ! E boundary weight - nxpf is the total x-grid length (1-less for u)
     numer = max( 0., float( npts_sponge + i+mi0(ngrid)-nxpf ) )
-    wgtE(i,j) = numer/float(npts_sponge)
+    wgtE(i,j) = numer*numer/float(npts_sponge*npts_sponge)
     if (jdim .eq. 1) then
       ! S boundary weight
       numer = max( 0., float( npts_sponge + 1-(j+mj0(ngrid)) ) )
-      wgtS(i,j) = numer/float(npts_sponge)
+      wgtS(i,j) = numer*numer/float(npts_sponge*npts_sponge)
       ! N boundary weight -  nypf is the total y-grid length (1-less for v)
       numer = max( 0., float( npts_sponge + j+mj0(ngrid)-nypf ) )
-      wgtN(i,j) = numer/float(npts_sponge)
+      wgtN(i,j) = numer*numer/float(npts_sponge*npts_sponge)
     endif
     ! take care of corners
     wgttot = wgtW(i,j)+wgtE(i,j)+wgtS(i,j)+wgtN(i,j)
@@ -181,10 +164,10 @@ do j = 1,m3
 enddo
 ! debugging
 !if( ngrid.eq.2 .and. vnam.eq.'w') then
-!  if( (mi0(ngrid).eq.0 .or. mi0(ngrid).gt.30) .and. (mj0(ngrid).eq.0 .or. mj0(ngrid).gt.25) ) then
-!    print'(2a,i1,a,2i4,a)',vnam,', grid',ngrid,', (i0,j0) = (',mi0(ngrid),mj0(ngrid),'),wgtS = '
+!  if( (mi0(ngrid).eq.0) .and. (mj0(ngrid).eq.0) ) then
+!    print'(2a,i1,a,2i4,a)',vnam,', grid',ngrid,', (i0,j0) = (',mi0(ngrid),mj0(ngrid),'),wgtW = '
 !    do j=m3,1,-1
-!      write(*,'(a,a,i02,999(2x,f4.2))') vnam,'j',j+mj0(ngrid),wgtS(:,j)
+!      write(*,'(a,a,i02,999(2x,f4.2))') vnam,'j',j+mj0(ngrid),wgtW(:,j)
 !    enddo
 !  endif
 !endif
