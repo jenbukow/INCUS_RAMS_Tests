@@ -1,0 +1,18 @@
+#PBS -S /bin/csh
+#PBS -V
+#PBS -q normal
+#PBS -lselect=1:ncpus=1:mpiprocs=1:model=bro,walltime=0:20:00
+#PBS -j oe
+#PBS -o /nobackupp19/swfreema/INCUS/basin_simulations/philippines_camp2ex_summer/stdout
+#PBS -N INCUS_GRIB_to_DP
+#PBS -m be
+#PBS -r n
+
+setenv MPI_TYPE_DEPTH 16
+module load gcc/10.3 mpi-hpe/mpt.2.25 comp-intel/2020.4.304 szip/2.1.1
+cd /path/to/RAMS/code/
+#limit coredumpsize unlimited
+
+#Run dgrib script
+./bin.dp.grib1/run_dgrib_era5.sh >& /nobackupp19/swfreema/INCUS/basin_simulations/argentina_cacti_summer_2018/stdout/dgrib_log_1.txt
+
