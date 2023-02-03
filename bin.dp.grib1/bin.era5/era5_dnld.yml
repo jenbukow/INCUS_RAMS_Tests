@@ -1,0 +1,8 @@
+name: era5_dnld
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - numpy
+  - cdsapi
+prefix: /home/pmarin/miniconda3/envs/era5_dnld
