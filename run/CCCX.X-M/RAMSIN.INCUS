@@ -101,7 +101,7 @@
 
 ! Variable initialization input
 
-   INITIAL  = 3,             ! Initial fields - 1=horiz.homogeneous, 
+   INITIAL  = 2,             ! Initial fields - 1=horiz.homogeneous, !CHANGEME
                              !                  2=init from varfile
                              !                  3=init from history
 
@@ -198,7 +198,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
 ! Analysis file input for assimilation: 1=yes, 0=no
 
-   IPAST_SFC = 1,            ! Initialize LEAF fields from history 
+   IPAST_SFC = 0,            ! Initialize LEAF fields from history !CHANGEME for history restarts
 
 !------------------------------------------------------------------------
    ICLOBBER = 1,             ! 0=stop if files exist, 1=overwite files
@@ -620,7 +620,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
                              ! MAXNUMBER*exp(-zt(k)/7000.)
                              ! ------------------------------------------
    IAEROPRNT  = 1,           ! Print aerosol init profiles (0=no,1=yes)
-   IAEROHIST  = 1,           ! Re-initialize aerosols on hist restart:0,1 
+   IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 !CHANGEME 
    ICCN_PROF  = 1,           ! CCN Profile Type
                              ! 1 = Exponential, using default 7000 m scale height
                              ! 2 = Constant in the Boundary Layer, Exponential above with a 3500 m scale height

@@ -1,7 +1,7 @@
 #PBS -S /bin/csh
 #PBS -V
 #PBS -q normal
-#PBS -lselect=1:ncpus=1:mpiprocs=1:model=bro,walltime=0:20:00
+#PBS -lselect=1:ncpus=1:mpiprocs=1:model=bro,walltime=00:30:00
 #PBS -j oe
 #PBS -o /home5/pmarines/INCUS/fPROD/RAMS/bin.dp.grib1/stdout.txt
 #PBS -N INCUS_GRIB_to_DP

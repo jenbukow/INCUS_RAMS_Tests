@@ -8,24 +8,23 @@ import os
 ############################################################################################
 # This is for 3D DATA
 
-
 # Specific save directory and filenames for saving
-savedir = '/nobackup/pmarines/PROD/PHI1.1-R/ERA5/'
-savename_p = 'ERA5_20190910_Pressure'
-savename_l = 'ERA5_20190910_Land'
-savename_f = 'ERA5_20190910'
+savedir = '/nobackup/pmarines/PROD/PHI1.2-R/ERA5/'
+savename_p = 'ERA5_20190909-10_Pressure'
+savename_l = 'ERA5_20190909-10_Land'
+savename_f = 'ERA5_20190909-10'
 filetype = 'grib'
 dir_finf = savedir + savename_f + '.' + filetype
 
 # Sepcific lat/lon bounding box
-las = 12; lan = 21 # Latitude bounds (South ; North)
-low = 113; loe = 122 # Longitude bounds (West ; East)
+las = 10; lan = 24 # Latitude bounds (South ; North)
+low = 122; loe = 138 # Longitude bounds (West ; East)
 
 # Specify date/dates 
 YY = '2019'
 MM = '09'
 #DD = ['13','14',]
-DD = '10'
+DD = ['09','10',]
 
 ############################################################################################
 ############################################################################################
@@ -69,7 +68,7 @@ c.retrieve(
 c = cdsapi.Client()
 dir_fin2 = savedir + savename_l + '.' + filetype
 c.retrieve(
-'reanalysis-era5-land',
+'reanalysis-era5-single-levels',
 {
     'product_type': 'reanalysis',
     'format': filetype,
