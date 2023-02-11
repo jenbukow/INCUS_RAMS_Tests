@@ -7,7 +7,7 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home5/pmarines/INCUS/Prod/RAMS/
+RAMS_ROOT=/home5/pmarines/INCUS/Prod/RAMS
 RAMS_VERSION=6.3.02
 
 #############################################################################
@@ -44,7 +44,7 @@ UTILS_INCS=-I$(MODEL)/include
 #  -Wl,-rpath,/home/smsaleeb/software/szip-2.1/lib \
 #  -Wl,-rpath,/home/smsaleeb/software/zlib-1.2.5/lib
 HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
-HDF5_INCS=-I$(HDF5_ROOT)/include -I$(H5Z_ZFP_ROOT)/include #Added ZFP Compression
+HDF5_INCS=-I$(HDF5_ROOT)/include -I$(H5Z_ZFP_ROOT)/include#Added ZFP Compression
 HDF5_DEFS=
 
 #############################################################################
@@ -113,8 +113,8 @@ F_COMP=mpif90
 # AMD Rome -- will produce identifical results on all machines (AMD, Intel), marginally slower than AMS Compatible Intel
 F_OPTS1=-free -O1 -fp-model strict -ipo -march=core-avx2 -qopt-zmm-usage=high -fimf-arch-consistency=true #-real-size 64
 F_OPTS2=-free -O2 -fp-model strict -ipo -march=core-avx2 -qopt-zmm-usage=high -fimf-arch-consistency=true #-real-size 64
-LOADER_OPTS= -free -O2 -fp-model strict -ipo -march=core-avx2 -qopt-zmm-usage=high -fimf-arch-consistency=true #-real-size 64
-LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz -L/nasa/szip/2.1.1/lib
+LOADER_OPTS=-free -O2 -fp-model strict -ipo -march=core-avx2 -qopt-zmm-usage=high -fimf-arch-consistency=true #-real-size 64
+LIBS=-L/lib64 -lrt -lpthread -lsz -lz -L/nasa/szip/2.1.1/lib
 
 #*****************************
 # FORTRAN INTEL IFORT COMPILER Double Precision
