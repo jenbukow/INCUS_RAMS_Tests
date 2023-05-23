@@ -113,7 +113,7 @@
    VWAIT1   = 0.,            ! wait between each VFILE check (s)
    VWAITTOT = 0.,            ! total wait before giving up on a VFILE (s)
    
-   NUDLAT   = 20,             ! Number of points in lateral bnd region !CHANGEME (2.5% of max(nnxp,nnyp))
+   NUDLAT   = 20,             ! Number of points in lateral bnd region 
    TNUDLAT  = 900.,          ! Nudging time scale(s) at lateral boundary
    TNUDCENT = 0.,            ! Nudging time scale(s) in center of domain
    TNUDTOP  = 900.,           ! Nudging time scale (s) at top of domain
@@ -212,7 +212,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
                               !   state,mean,lite,both
                               
 !------------------------------------------------------------------------
-   FRQSTATE   = 900.,900.,900., ! "state" file write frequency !CHANGEME
+   FRQSTATE   = 1800.,1800.,1800., ! "state" file write frequency !CHANGEME
                               !  can be different for each grid
                               !  works best if grids are multiples of each other
    FRQST_KEEP   = 0.,0.,0.,      ! If > 0., frequency at which "state" files will be 
