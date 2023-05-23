@@ -4,12 +4,12 @@
 
 !  Simulation title (64 chars)
 
-   EXPNME   = 'EXPERIMENT_ABBREVIATION_#Grids',  !CHANGEME
+   EXPNME   = 'PHI1.1-R_G1',  !CHANGEME
 
 !  Type of model run to perform
 
-   RUNTYPE  = 'INITIAL',                    !CHANGEME                              
-!   RUNTYPE  = 'MAKESFC',                       
+!   RUNTYPE  = 'INITIAL',                    !CHANGEME                              
+   RUNTYPE  = 'MAKESFC',                       
 !   RUNTYPE  = 'MAKEVFILE',
 !   RUNTYPE  = 'MAKEHFILE',
 !   RUNTYPE  = 'HISTORY',
@@ -17,21 +17,21 @@
 
    TIMEUNIT = 'h',          ! 'h','m','s' - Time units of TIMMAX, TIMSTR
 
-   TIMMAX   = 8.5,           ! Final time of simulation !CHANGEME
+   TIMMAX   = 24,           ! Final time of simulation !CHANGEME
 
 !  Start of simulation or ISAN processing
 
-   IMONTH1  = 12,           ! Month   !CHANGEME
-   IDATE1   = 13,           ! Day     !CHANGEME
-   IYEAR1   = 2018,         ! Year    !CHANGEME
-   ITIME1   = 1200,         ! GMT of model TIME = 0. !CHANGEME
+   IMONTH1  = 9,           ! Month   !CHANGEME
+   IDATE1   = 9,           ! D1 = 10 Day     !CHANGEME
+   IYEAR1   = 2019,         ! Year    !CHANGEME
+   ITIME1   = 1800,         ! D1 = 0000 GMT of model TIME = 0. !CHANGEME
 
 ! Grid specifications
 
-   NGRIDS   = 3,            ! Number of grids to run !CHANGEME
+   NGRIDS   = 1,            ! Number of grids to run !CHANGEME
  
-   NNXP     = 490,702,1950,        ! Number of x gridpoints !CHANGEME
-   NNYP     = 490,702,1922,        ! Number of y gridpoints !CHANGEME
+   NNXP     = 580,702,1950,        ! D1=530 Number of x gridpoints !CHANGEME
+   NNYP     = 500,702,1922,        ! D1=486 Number of y gridpoints !CHANGEME
    NNZP     = 232,232,232,        ! Number of z gridpoints
    NZG      = 11,           ! Number of soil layers
    NZS      = 1,            ! Maximum number of snow layers
@@ -77,8 +77,8 @@
              2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
              2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
                             
-   POLELAT  = -31.8,         ! If polar, latitude/longitude of pole point !CHANGEME
-   POLELON  = -63.6,        !CHANGEME
+   POLELAT  = 16.7,         !D1 = 16.5 If polar, latitude/longitude of pole point !CHANGEME
+   POLELON  = 118.75,        !D1 = 117.0 CHANGEME
 
    ! Grid point on the next coarser nest where the lower southwest
    !  corner of this nest will start.
@@ -88,8 +88,8 @@
    NJNEST   = 1,0,0,0,           ! j-point
    NKNEST   = 1,1,1,1,           ! k-point
 
-   CENTLAT =  -31.8,-33.1,-33.15, ! Center lat/lon of grids, may or !CHANGEME
-   CENTLON =  -63.6,-62.5,-62.45, ! may not be same as pole point   !CHANGEME
+   CENTLAT =  16.7,-33.1,-33.15, ! Center lat/lon of grids, may or !CHANGEME
+   CENTLON =  118.75,-62.5,-62.45, ! may not be same as pole point   !CHANGEME
  
    NNSTTOP  = 1,1,1,1,           ! Flag (0-no or 1-yes) if this
    NNSTBOT  = 1,1,1,1,           ! Nest goes the top or bottom of the
@@ -109,7 +109,7 @@
    NUD_TYPE = 1,             ! =0 - no analysis nudging
                              ! =1 - nudge from varfiles
                              
-   VARFPFX  = '/nobackup/pmarines/V/S/CA_B1_3G/T4/var/var',       ! Varfile prefix !CHANGEME
+   VARFPFX  = '/nobackup/pmarines/PROD/PHI1.1-R/G1/var/var',       ! Varfile prefix !CHANGEME
    VWAIT1   = 0.,            ! wait between each VFILE check (s)
    VWAITTOT = 0.,            ! total wait before giving up on a VFILE (s)
    
@@ -198,7 +198,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
 ! Analysis file input for assimilation: 1=yes, 0=no
 
-   IPAST_SFC = 1,            ! Initialize LEAF fields from history 
+   IPAST_SFC = 0,            ! Initialize LEAF fields from history 
 
 !------------------------------------------------------------------------
    ICLOBBER = 1,             ! 0=stop if files exist, 1=overwite files
@@ -207,12 +207,12 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 !  Analysis file output
  
    IOUTPUT  =  1,             ! 0-no files, 1-write files
-   AFILEPREF  = '/nobackup/pmarines/V/S/CA_B1_3G/T4/G3/h1.1/a', !CHANGEME  
+   AFILEPREF  = '/nobackup/pmarines/PROD/PHI1.1-R/G1/ini/a', !CHANGEME  
                               ! File prefix for all analysis files
                               !   state,mean,lite,both
                               
 !------------------------------------------------------------------------
-   FRQSTATE   = 900.,900.,900., ! "state" file write frequency !CHANGEME
+   FRQSTATE   = 1800.,900.,900., ! "state" file write frequency !CHANGEME
                               !  can be different for each grid
                               !  works best if grids are multiples of each other
    FRQST_KEEP   = 0.,0.,0.,      ! If > 0., frequency at which "state" files will be 
@@ -269,10 +269,10 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
 ! Input topography variables !CHANGEME (Paths)
 
-   TOPFILES = '/nobackup/pmarines/V/S/CA_B1_3G/T4/sfc/toph', ! Path and prefix for topo files.   !CHANGEME 
-   SFCFILES = '/nobackup/pmarines/V/S/CA_B1_3G/T4/sfc/sfch', ! Path and prefix for surface files.!CHANGEME
-   SSTFPFX  = '/nobackup/pmarines/V/S/CA_B1_3G/T4/sfc/ssth', ! Path and prefix for sst files     !CHANGEME
-   NDVIFPFX = '/nobackup/pmarines/V/S/CA_B1_3G/T4/sfc/ndh',  ! Path and prefix for ndni files    !CHANGEME
+   TOPFILES = '/nobackup/pmarines/PROD/PHI1.1-R/G1/sfc/toph', ! Path and prefix for topo files.   !CHANGEME 
+   SFCFILES = '/nobackup/pmarines/PROD/PHI1.1-R/G1/sfc/sfch', ! Path and prefix for surface files.!CHANGEME
+   SSTFPFX  = '/nobackup/pmarines/PROD/PHI1.1-R/G1/sfc/ssth', ! Path and prefix for sst files     !CHANGEME
+   NDVIFPFX = '/nobackup/pmarines/PROD/PHI1.1-R/G1/sfc/ndh',  ! Path and prefix for ndni files    !CHANGEME
 
    ITOPTFLG = 1,1,1,           ! 2 - Fill data in "leaf3_init"
    ISSTFLG  = 1,1,1,           ! 0 - Interpolate from coarser grid
@@ -627,12 +627,12 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
                              ! 3 = Constant in the Boundary Layer, Linear Decreasing to Free Tropospheric Value,
                              !     then Linear Decrease to Model Top
 
-   CCN_MAX    = 2500.,       ! CCN at surface (#/mg) !CHANGEME 500. or 2500. (for Low/High)
-   CCN_SH     = 5000.,       ! CCN exponential scale height (for ICCN_PROF = 1 or 2) !CHANGEME 10000. or 5000. (for Low/High)  
+   CCN_MAX    = 500.,       ! CCN at surface (#/mg) !CHANGEME 500. or 2500. (for Low/High)
+   CCN_SH     = 10000.,       ! CCN exponential scale height (for ICCN_PROF = 1 or 2) !CHANGEME 10000. or 5000. (for Low/High)  
    BL_HGT     = 2000.,       ! Boundary layer height (m) - for CCN_PROF=2
    TRAN_DEPTH = 1000.,       ! Transition depth (linear) for BL -> FT ccn conc. (m) - for CCN_PROF=3
    CCN_FT     = 100.,        ! Free Tropospheric CCN Concentration - for CCN_PROF=3
-   CIN_MAX    = 10.,         ! Ice Nuclei (#/mg) !CHANGEME 1. or 10. (for Low/High)
+   CIN_MAX    = 1.,         ! Ice Nuclei (#/mg) !CHANGEME 1. or 10. (for Low/High)
    CIN_SH     = 5000.,       ! Ice Nuclei expoential scale height (for IIFN = 1 or 2)
 
    GCCN_MAX   = 0.0,        ! Giant-CCN (#/mg)
@@ -752,7 +752,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
 ! Input data file prefixes
    IDATAIN = 1,             ! dp-p files have: 0=Relhum, 1=specific humidity
-   IAPR    = '/nobackup/pmarines/V/CA_B1_DP/dp-p', ! Input press level dataset !CHANGEME
+   IAPR    = '/nobackup/pmarines/PROD/PHI1.1-R/DP/dp-p', ! Input press level dataset !CHANGEME
    IARAWI  = ' ', ! Archived rawindsonde file name
    IASRFCE = ' ', ! Archived surface obs file name
 
@@ -761,7 +761,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
 ! File names and dispose flags 
 
-   VARPFX    = '/nobackup/pmarines/V/S/CA_B1_3G/T4/var/var',  ! isan file names prefix !CHANGEME
+   VARPFX    = '/nobackup/pmarines/PROD/PHI1.1-R/G1/var/var',  ! isan file names prefix !CHANGEME
    IOFLGISZ  = 0,           ! Isen-sigz file flag: 0 = no write, 1 = write
    IOFLGVAR  = 1,           ! Var file flag: 0 = no write, 1 = write
 
