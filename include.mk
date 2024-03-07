@@ -1,17 +1,3 @@
-# NOTES:
-# For doing parallel simulations, compile MPICH or OPENMPI with both FORTRAN
-# and C bindings turned on like the following configure statement for
-# compiling MPICH. Most of the time you enter the software package main
-# directory, issue the "configure" command, run "make", and then "make install".
-# For the configure statement to work, your ".bash_profile" needs to know "which"
-# C and Fortran compilers you are using. After compiling MPICH in this example,
-# it will create "mpif90" and "mpicc" that you can use in this include.mk file
-# for "F_COMP" and "C_COMP" env variables below. Make sure the paths to these
-# compilers and associated libraries are in your .bash_profile PATH and
-# LD_LIBRARY_PATH as needed.
-# ./configure --prefix=/file-path-here-for-mpi/mpich-3.3.2 \
-#  --enable-fast=O3 CPPFLAGS=-DNDEBUG CC=gcc FC=ifort
-
 #############################################################################
 # Define make (gnu make works best).
 #############################################################################
@@ -20,8 +6,8 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_steve_git/RAMS
-RAMS_VERSION=6.3.04
+RAMS_ROOT=/home/smsaleeb/rams_20210806_dev
+RAMS_VERSION=6.3.02
 
 #############################################################################
 # Set root locations for HDF5 I/O software.
@@ -42,7 +28,7 @@ MPI_ROOT=/home/smsaleeb/software/mpich-3.3.2
 #############################################################################
 # Do not change these 2. They point from RAMS_ROOT to the source code.
 #############################################################################
-MODEL=$(RAMS_ROOT)/src
+MODEL=$(RAMS_ROOT)/src/$(RAMS_VERSION)
 UTILS_INCS=-I$(MODEL)/include
 
 #############################################################################
@@ -94,8 +80,7 @@ CMACH=PC_LINUX1  #Standard Linux (only option available now)
 # (-g) for debugging, (-traceback) for more compiler error info
 # (-check bounds) for array bounds checking, (-fp-model precise) for IEEE
 # (-check uninit) for finding uninitialized variables, (-free) for free format
-#F_COMP=/home/smsaleeb/intel/composer_xe_2011_sp1.8.273/bin/intel64/ifort
-F_COMP=/home/smsaleeb/software/mpich-3.3.2/bin/mpif90
+F_COMP=/home/smsaleeb/intel/composer_xe_2011_sp1.8.273/bin/intel64/ifort
 F_OPTS1=-free -O1 -fp-model precise
 F_OPTS2=-free -O2 -fp-model precise
 LOADER_OPTS= -free -O2 -fp-model precise
@@ -141,7 +126,7 @@ LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 #############################################################################
 # C compiler choice and flags (gcc) and (mpicc) are most common
 # Add the "-DRAMS_DOUBLE_PREC" compiler flag to "C_OPTS" for turning on
-# double precision rather than default single precision. Note that using
+# double precision rather than default double precision. Note that using
 # double will make output and runtimes substantially longer but provide the
 # extra precision needed in some highly sensitive simulations.
 #
@@ -181,10 +166,9 @@ ARCH=ar rsU
 #  software and HDF5 software.
 # Add or remove needed libraries to PAR_LIBS. Missing or needed libraries
 #  will be highlighted in compile time error messages. Typical library
-#  specs are: -lmpich, -lmpl, -lmpi, -lmpifort
+#  specs are: -lmpich, -lmpl, -lmpi.
 # Comment out these "PAR_" lines for serial processing compile.
 #############################################################################
 PAR_INCS=-I$(MPI_ROOT)/include
-#PAR_LIBS=-L$(MPI_ROOT)/lib -lmpich -lmpl
-PAR_LIBS=-L$(MPI_ROOT)/lib
+PAR_LIBS=-L$(MPI_ROOT)/lib -lmpich -lmpl
 PAR_DEFS=-DRAMS_MPI
