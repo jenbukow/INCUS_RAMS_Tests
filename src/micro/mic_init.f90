@@ -207,7 +207,7 @@ implicit none
 integer :: n1,n2,n3,i,j,k,ifm
 real :: ft_hgt ! PJM - height of free tropsophere (boundary layer height + transition depth)
 real, dimension(n1,n2,n3) :: cn1np,cn1mp,dn0
-real :: ccn1_maxt,ccn_ftt
+real :: ccn_maxt,ccn_ftt
 
 ! Initialize CCN mode 1
 if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 1 concen'
@@ -221,18 +221,18 @@ do j = 1,n3
   do k = 1,n1
 
    !Set up Vertical profile
-   if(k<=2) cccnp(k,i,j)=ccn_maxt
+   if(k<=2) cn1np(k,i,j)=ccn_maxt
      
      if(iccn_prof==1) then
        !Exponential decrease that scales with pressure decrease
-       if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/ccn_sh)
+       if(k>2)  cn1np(k,i,j)=ccn_maxt*exp(-zt(k)/ccn_sh)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
      elseif(iccn_prof==2) then
        !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
-       if(zt(k)<=bl_hgt) cccnp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+       if(zt(k)<=bl_hgt) cn1np(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
 
-       if(zt(k)>bl_hgt)  cccnp(k,i,j) = ccn_maxt * exp(-zt(k)/ccn_sh) ! Exponential decrease that scales with height 
+       if(zt(k)>bl_hgt)  cn1np(k,i,j) = ccn_maxt * exp(-zt(k)/ccn_sh) ! Exponential decrease that scales with height 
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
      elseif(iccn_prof==3) then
@@ -240,14 +240,14 @@ do j = 1,n3
        !troposphere value, and decreasing to the model top
        ft_hgt = bl_hgt + tran_depth ! Calculate free troposphere height
 
-       if(zt(k)<=bl_hgt) cccnp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+       if(zt(k)<=bl_hgt) cn1np(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
 
        ! Linear decrease during transition depth to free tropospheric value
-       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  cccnp(k,i,j) = (ccn_maxt - &
+       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  cn1np(k,i,j) = (ccn_maxt - &
          ((ccn_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
 
        ! Linear decrease from free troposphere to 0 to the model top
-       if(zt(k)> ft_hgt) cccnp(k,i,j) = (ccn_ftt - (ccn_ftt * & 
+       if(zt(k)> ft_hgt) cn1np(k,i,j) = (ccn_ftt - (ccn_ftt * & 
            (zt(k) - ft_hgt) / (zt(n1) - ft_hgt))) 
      
      endif
@@ -546,7 +546,7 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm,nsc,ii,jj
 real, dimension(n1,n2,n3) :: tracerp,dn0
-real :: ccn1_maxt,ccn_ftt
+real :: ccn_maxt,ccn_ftt
 real :: ft_hgt ! PJM - height of free tropsophere (boundary layer height + transition depth)
 
 ! Initialize Tracers
