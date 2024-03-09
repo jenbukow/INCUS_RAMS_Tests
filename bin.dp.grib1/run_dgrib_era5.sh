@@ -25,7 +25,7 @@ do
         # -d specifies the input date to pull from the file
         # -t 6 specifies to use ERA5 with specific humidity
         # -f specifies in the input grid file
-        ./dgrib-6.3.02 -t 6 -d $YEAR$MONTH$day$hour -h 0 -f $IN_FILE
+        ./dgrib-6.3.04 -t 6 -d $YEAR$MONTH$day$hour -h 0 -f $IN_FILE
         mv dp-p$YEAR-$MONTH-$day-"$hour"00* $OUT_DIR
     done
 done
