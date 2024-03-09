@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=37,nvstrt=78,nvindat=154,nvsound=10
+integer, parameter ::nvgrid=37,nvstrt=78,nvindat=153,nvsound=10
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -75,7 +75,7 @@ DATA INDAT/  &
      ,'IDUST','IDUSTLOFT','DUSTFILE','ICCNLEV','IIFN','IIFN_FORMULA'     &
      ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CIN_SH'   &
      ,'CCN1_MAX','CCN2_MAX','ICCN_PROF','CCN_SH','BL_HGT','TRAN_DEPTH'   &
-     ,'CCN_FT','GCCN_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX'            &
+     ,'CCN_FT','DUST1_MAX','DUST2_MAX','SALTF_MAX'                       &
      ,'SALTJ_MAX','SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'  &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
      ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT','IABCARB'        &
