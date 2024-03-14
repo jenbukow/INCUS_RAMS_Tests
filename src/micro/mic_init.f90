@@ -174,6 +174,9 @@ do j = 1,n3
    !Convert RAMSIN #/mg to #/kg
    cin_maxt = cin_max * 1.e6
 
+   !!!!JB commented out extra if statement below for SPICULE/MC3E IFN !!!!
+   !if (cin_max >= 0.0) then
+
    !Set up Vertical profile 
    if(k<=2) cifnp(k,i,j)=cin_maxt
    ! Exponential decrease that scales with pressure decrease
@@ -186,6 +189,60 @@ do j = 1,n3
         ,k,zt(k),cifnp(k,i,j),cifnp(k,i,j)/1.e3*dn0(k,i,j)
    endif
 
+!!!! JB start comment out SPICULE/MC3E INP profiles from V6.3.04 !!!!
+!!!! INCUS is using idealized profiles set in lines [174-187]    !!!!
+!!!! above and not these observations                            !!!!
+
+   !!*************************************************************************** 
+   !!Use SPICULE INP profile if cin_maxt ~ -1.0
+   !!Profile from aircraft obs during the SPICULE field campaign.
+   !!To mimic the SPICULE profile in magnitude, need to set the following parameters.
+   !!and use IIFN=2 for DeMott scheme, and IFN_FORMULA=2 for DeMott(2015) dust formula.
+   !!Perhaps using this profile is more realistic given that is has basis
+   !!in reality from observations of the central-western continental U.S.
+
+   !elseif (cin_max > -1.01 .and. cin_max < -0.99) then
+   ! e_t = 0.10 ! Controls the shape of the profile
+   ! e_a = 2.50 ! approximately cin_maxt
+   ! e_k = 3.80
+   ! e_b = 5.80 ! Level where you want profile to start decreasing
+   ! e_c = 1.32 ! Necessary so you do not get negative numbers (changes with "a")
+   ! cifnp(k,i,j)=(-1.0*(e_a/2.0)*(erf(((zt(k)/1000)-e_b)/sqrt(4.0*e_k*e_t)))+e_c)
+   ! !NOTE THAT THIS CURVE FIT TO DATA IS BASED ON #/CM3 UNITS, SO CONVERT BELOW
+   ! cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 / dn0(k,i,j) ! convert #/cm3 to #/kg
+   ! !Output initial sample profile
+   ! if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+   !  if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+   !  print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
+   !    ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+   ! endif
+
+   !!*************************************************************************** 
+   !!Use MC3E INP profile if cin_maxt ~ 2.0
+   !!Profile from aircraft obs during the MC3E field project. (Marinescu et al. 2016)
+   !!To mimic the MC3E profile in magnitude, need to set the following parameters.
+   !!and use IIFN=2 for DeMott scheme, and IFN_FORMULA=1 for DeMott(2010) general formula.
+   !!Perhaps using this profile is more realistic given that is has basis
+   !!in reality from observations in the southern great plains of the continental U.S. 
+   !elseif (cin_max > -2.01 .and. cin_max < -1.99) then
+    !e_t = 0.35 ! Controls the shape of the profile
+    !e_a = 3.28 ! approximately cin_maxt
+    !e_k = 3.00
+    !e_b = 2.27 ! Level where you want profile to start decreasing
+    !e_c = 1.96 ! Necessary so you do not get negative numbers (changes with "a")
+    !cifnp(k,i,j)=(-1.0*(e_a/2.0)*(erf(((zt(k)/1000)-e_b)/sqrt(4.0*e_k*e_t)))+e_c)
+    !!NOTE THAT THIS CURVE FIT TO DATA IS BASED ON #/MG UNITS, SO CONVERT BELOW
+    !cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 ! convert #/mg to #/kg
+    !!Output initial sample profile
+    !if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+    ! if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+    ! print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
+    !   ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    !endif
+   !!***************************************************************************
+
+!!!! JB end comment out SPICULE/MC3E INP profiles                !!!!
+  
   enddo
  enddo
 enddo
@@ -207,13 +264,13 @@ implicit none
 integer :: n1,n2,n3,i,j,k,ifm
 real :: ft_hgt ! PJM - height of free tropsophere (boundary layer height + transition depth)
 real, dimension(n1,n2,n3) :: cn1np,cn1mp,dn0
-real :: ccn_maxt,ccn_ftt
+real :: ccn1_maxt,ccn_ftt
 
 ! Initialize CCN mode 1
 if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 1 concen'
 
 !Convert RAMSIN #/mg to #/kg
- ccn_maxt = ccn1_max * 1.e6 
+ ccn1_maxt = ccn1_max * 1.e6 
  ccn_ftt = ccn_ft * 1.e6
 
 do j = 1,n3
@@ -221,18 +278,18 @@ do j = 1,n3
   do k = 1,n1
 
    !Set up Vertical profile
-   if(k<=2) cn1np(k,i,j)=ccn_maxt
+   if(k<=2) cn1np(k,i,j)=ccn1_maxt
      
      if(iccn_prof==1) then
        !Exponential decrease that scales with pressure decrease
-       if(k>2)  cn1np(k,i,j)=ccn_maxt*exp(-zt(k)/ccn_sh)
+       if(k>2)  cn1np(k,i,j)=ccn1_maxt*exp(-zt(k)/ccn_sh)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
      elseif(iccn_prof==2) then
        !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
-       if(zt(k)<=bl_hgt) cn1np(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+       if(zt(k)<=bl_hgt) cn1np(k,i,j) = ccn1_maxt  ! Constant ccn conc. in boundary layer
 
-       if(zt(k)>bl_hgt)  cn1np(k,i,j) = ccn_maxt * exp(-zt(k)/ccn_sh) ! Exponential decrease that scales with height 
+       if(zt(k)>bl_hgt)  cn1np(k,i,j) = ccn1_maxt * exp(-zt(k)/ccn_sh) ! Exponential decrease that scales with height 
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
      elseif(iccn_prof==3) then
@@ -240,11 +297,11 @@ do j = 1,n3
        !troposphere value, and decreasing to the model top
        ft_hgt = bl_hgt + tran_depth ! Calculate free troposphere height
 
-       if(zt(k)<=bl_hgt) cn1np(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+       if(zt(k)<=bl_hgt) cn1np(k,i,j) = ccn1_maxt  ! Constant ccn conc. in boundary layer
 
        ! Linear decrease during transition depth to free tropospheric value
-       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  cn1np(k,i,j) = (ccn_maxt - &
-         ((ccn_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
+       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  cn1np(k,i,j) = (ccn1_maxt - &
+         ((ccn1_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
 
        ! Linear decrease from free troposphere to 0 to the model top
        if(zt(k)> ft_hgt) cn1np(k,i,j) = (ccn_ftt - (ccn_ftt * & 
@@ -546,14 +603,14 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm,nsc,ii,jj
 real, dimension(n1,n2,n3) :: tracerp,dn0
-real :: ccn_maxt,ccn_ftt
+real :: ccn1_maxt,ccn_ftt
 real :: ft_hgt ! PJM - height of free tropsophere (boundary layer height + transition depth)
 
 ! Initialize Tracers
 if(print_msg) print*,'Start Initializing Tracers, Grid:',ifm,' Tracer:',nsc
 
 !Convert RAMSIN #/mg to #/kg
- ccn_maxt = ccn1_max * 1.e6 
+ ccn1_maxt = ccn1_max * 1.e6 
  ccn_ftt = ccn_ft * 1.e6
 
 do j = 1,n3
@@ -566,18 +623,18 @@ do j = 1,n3
 
    !Set up Vertical profile
    if(nsc==1) then
-    if(k<=2) tracerp(k,i,j)=ccn_maxt
+    if(k<=2) tracerp(k,i,j)=ccn1_maxt
     
      if(iccn_prof==1) then
        !Exponential decrease that scales with pressure decrease
-       if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+       if(k>2)  tracerp(k,i,j)=ccn1_maxt*exp(-zt(k)/7000.)
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
      elseif(iccn_prof==2) then
        !More realistic profile, with constant ccn in boundary layer and exp. decr. above boundary layer
-       if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+       if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn1_maxt  ! Constant ccn conc. in boundary layer
 
-       if(zt(k)>bl_hgt)  tracerp(k,i,j) = ccn_maxt * exp(-zt(k)/3500.) ! Exponential decrease that scales with height 
+       if(zt(k)>bl_hgt)  tracerp(k,i,j) = ccn1_maxt * exp(-zt(k)/3500.) ! Exponential decrease that scales with height 
 
      ! PJM Added more realistic aerosol profile (loosely based on observed vertical profiles)
      elseif(iccn_prof==3) then
@@ -586,11 +643,11 @@ do j = 1,n3
        !Note: requires roughly constant boundary layer throughout simulation time
        ft_hgt = bl_hgt + tran_depth ! Calculate free troposphere height
 
-       if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn_maxt  ! Constant ccn conc. in boundary layer
+       if(zt(k)<=bl_hgt) tracerp(k,i,j) = ccn1_maxt  ! Constant ccn conc. in boundary layer
 
        ! Linear decrease during transition depth to free tropospheric value
-       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  tracerp(k,i,j) = (ccn_maxt - &
-         ((ccn_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
+       if(zt(k)>bl_hgt .and. zt(k)<= ft_hgt)  tracerp(k,i,j) = (ccn1_maxt - &
+         ((ccn1_maxt - ccn_ftt) * (zt(k)-bl_hgt) / tran_depth))
 
        ! Linear decrease from free troposphere to 0 to the model top
        if(zt(k)> ft_hgt) tracerp(k,i,j) = (ccn_ftt - (ccn_ftt * & 

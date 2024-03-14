@@ -227,7 +227,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
    LITE_VARS= 'THETA','RV','WP','VP','UP','PI','PP',                 ! 3D State (7)
             'CCP','CDP','CRP','CHP','CGP','CPP','CAP','CSP',         ! 3D Number concentration (8)
-            'CCCNP','REGEN_AERO1_NP','CIFNP',                        ! 3D Aerosol # Concentrations (3)
+            'CN1NP','REGEN_AERO1_NP','CIFNP',                        ! 3D Aerosol # Concentrations (3)
             'RCP','RDP','RRP','RHP','RGP','RPP','RAP','RSP',         ! 3D Mixing Ratio (8)
             'LATHEATVAP','LATHEATFRZ','FTHRD','RTP',                 ! 3D rates (4)
             'SOIL_ENERGY','SOIL_WATER',                              ! 4D Soil (2)
@@ -244,7 +244,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
    ACC_LT_VAR= 0.001, 0.0000001, 0.001, 0.001, 0.001, 0.0001, 0.000001, ! 'THETA','RV','WP','VP','UP','PI','PP',
                0.1, 0.1, 0.1, 0.1,                                      ! 'CCP','CDP','CRP','CHP',
                0.1, 0.1, 0.1, 0.1,                                      ! 'CGP','CPP','CAP','CSP',
-               10.0, 10.0, 10.0,                                        ! 'CCNNP','REGEN_AERO1_NP','CIFNP'
+               10.0, 10.0, 10.0,                                        ! 'CN1NP','REGEN_AERO1_NP','CIFNP'
                0.00000001, 0.00000001, 0.00000001, 0.00000001,          ! 'RCP','RDP','RRP','RHP',
                0.00000001, 0.00000001, 0.00000001, 0.00000001,          ! 'RGP','RPP','RAP','RSP',
                0.0000001, 0.0000001, 0.00000001, 0.0000001,             ! 'LATHEATVAP','LATHEATFRZ','FTHRD','RTP',
@@ -342,14 +342,14 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
    DISTIM   = 60.,           !                   - dissipation time scale
 
    ISPONGE_PTS = 0,5,8,      !  Number of nested grid boundary sponge points !CHANGEME 
-   SPONGE_TAU  = 30.,        !  Nested grid sponge zone time scale (seconds)
+   SPONGE_TAU  = 0.,30.,30., !  Nested grid sponge zone time scale (seconds)
 
 ! Radiation parameters
  
    ISWRTYP  = 3,             ! Shortwave radiation type
    ILWRTYP  = 3,             ! Longwave radiation type
                              !    0-none, 2-Mahrer/Pielke, 1-Chen, 3-Harrington
-   RADFRQ   = 30.,          ! Freq. of radiation tendency update (s)
+   RADFRQ   = 30.,           ! Freq. of radiation tendency update (s)
    LONRAD   = 1,             ! Longitudinal variation of shortwave  
                              !    (0-no, 1-yes)
  
@@ -582,7 +582,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
 
 ! Aerosol parameters         ! See mic_init.f90 for setting profiles
                              ! ------------------------------------------
-   IAEROSOL = 1,             ! CCN,GCCN: 0=off, 1=userset
+   IAEROSOL = 1,             ! CCN-1,CCN-2: 0=off, 1=userset
    ISALT    = 0,             ! Sea Salt: 0=off, 1=userset, 2=saltmodel
    IDUST    = 0,             ! Dust: 0=off, 1=userset 2=dustmodel
    IABCARB = 0,              ! Absorbing carbon: 0=off, 1=userset
@@ -627,8 +627,8 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
                              ! 3 = Constant in the Boundary Layer, Linear Decreasing to Free Tropospheric Value,
                              !     then Linear Decrease to Model Top
 
-   CCN_MAX1   = 2500.,       ! CCN at surface (#/mg) !CHANGEME 500. or 2500. (for Low/High)
-   CCN_MAX2   = 0.,          ! CCN-mode-2 (#/mg) 
+   CCN1_MAX   = 2500.,       ! CCN at surface (#/mg) !CHANGEME 500. or 2500. (for Low/High)
+   CCN2_MAX   = 0.,          ! CCN-mode-2 (#/mg) 
    CCN_SH     = 5000.,       ! CCN exponential scale height (for ICCN_PROF = 1 or 2) !CHANGEME 10000. or 5000. (for Low/High)  
    BL_HGT     = 2000.,       ! Boundary layer height (m) - for CCN_PROF=2
    TRAN_DEPTH = 1000.,       ! Transition depth (linear) for BL -> FT ccn conc. (m) - for CCN_PROF=3
@@ -651,7 +651,7 @@ HFILIN = '/nobackup/pmarines/V/S/CA_B1_3G/T4/r/a-A-2018-12-13-183000-head.txt',
    AERO_EPSILON = 0.90,0.90,0.05,0.05,1.00,1.00,1.00,0.05,0.05,0.20,0.20, 
 
    ! Aerosol 9 categories initial median radius (meters)
-   AERO_MEDRAD  = 0.04e-6,3.00e-6,          !CCN,GCCN
+   AERO_MEDRAD  = 0.04e-6,3.00e-6,          !CCN-1,CCN-2
                   0.05e-6,0.50e-6,          !Dust1,Dust2
                   0.10e-6,1.00e-6,6.00e-6,  !SeaSalt: film,jet,spume
                   0.05e-6,0.05e-6,          !Absorbing carbon
