@@ -18,7 +18,7 @@ RAMS_VERSION=6.3.04
 #############################################################################
 HDF5_ROOT=/home5/pmarines/INCUS/misc/hdf5-1.10.8_build
 # ZFP ROOT only needed if gcc compiler flag '-DENABLE_ZFP_COMPRESSION' is used
-H5Z_ZFP_ROOT=/home5/pmarines/INCUS/misc/H5Z-ZFP_build # For ZFP Compression
+H5Z_ZFP_ROOT=/home5/pmarines/INCUS/misc/H5Z-ZFP_build# For ZFP Compression
 
 #############################################################################
 # Set root locations for parallel processing MPI software.
