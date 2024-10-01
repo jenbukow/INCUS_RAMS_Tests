@@ -1,0 +1,1 @@
+Note. I had originally run this with the same grid as V0, but because WRF was having issues with the original grid 1 and moved it by 0.5 degrees to the east. I reran these simulations to match the WRF grids. Ultimately, the convection looked similar enough between the two simulations. - Peter
