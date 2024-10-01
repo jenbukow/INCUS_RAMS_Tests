@@ -1,0 +1,2 @@
+Used Jennie compilations since she ran original version and I wanted to compare new surface files tests to her old surface file tests
+Had to rerun from beginning (_re files), since it was so long since we originally ran this case, and the architecture on pleadies changed, resulting in no-longer identical results in RAMS
