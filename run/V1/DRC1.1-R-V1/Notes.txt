@@ -1,0 +1,2 @@
+Used Jennie compilations since she ran original version and I wanted to compare new surface files tests to her old surface file tests
+Note: rerun indicates a re run of G3 with 30s output to account for an update in the lite file variable list name that was needed for the 30s output times
